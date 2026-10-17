@@ -34,7 +34,7 @@ jobs:
                       thread=data.get('faultingThread',0)
                       frames=data.get('threads',[{}])[thread].get('frames',[])
                       reports.append({'name':file.name,'process':data.get('procName'),'exception':data.get('exception'),'termination':data.get('termination'),
-                                      'frames':[{k:f[k] for k in ('symbol','symbolLocation','imageIndex') if k in f} for f in frames[:30]]})
+                                      'images':[{k:i.get(k) for k in ('name','base','size','uuid')} for i in data.get('usedImages',[])], 'frames':[{k:f[k] for k in ('symbol','symbolLocation','imageIndex','imageOffset') if k in f} for f in frames[:30]]})
                   except (ValueError,IndexError):
                       pass
               else:
@@ -44,3 +44,4 @@ jobs:
           print(json.dumps(reports,indent=2))
           PY
           gh release upload experimental-run-39004968676 report/test-run-2-summary.json report/test-run-2-crashes.json --clobber
+
