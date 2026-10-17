@@ -1,0 +1,125 @@
+name: Build experimental iOS
+on:
+  workflow_dispatch:
+    inputs:
+      network_tests:
+        description: 'Executar testes reais de WKWebView, DNS/TLS e 62qpix.vip'
+        type: boolean
+        default: true
+      full_device_matrix:
+        description: 'Testar todos os modelos de simulador disponíveis (mais lento)'
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  prepare-source:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Expand reviewed source archive once
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f LinkCapture.xcodeproj/project.pbxproj ]; then
+            echo 'Native sources already present.'
+            exit 0
+          fi
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          with ZipFile('LinkCapture-iOS-Nativo-experimental.zip') as archive:
+              for entry in archive.infolist():
+                  parts = Path(entry.filename).parts
+                  if not parts or parts[0] != 'LinkCaptureNative' or len(parts) < 2:
+                      continue
+                  relative = Path(*parts[1:])
+                  if any(part in ('.git', '.github', '..') for part in relative.parts) or relative.is_absolute():
+                      continue
+                  if entry.is_dir():
+                      continue
+                  relative.parent.mkdir(parents=True, exist_ok=True)
+                  relative.write_bytes(archive.read(entry))
+          PY
+          git add LinkCapture LinkCaptureTests LinkCapture.xcodeproj scripts README.md COMPATIBILIDADE.md INSTALAR-NO-WINDOWS.md .gitignore DNS-Windows-observado.json TLS-Windows-observado.json
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Expand reviewed native iOS source files'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+  ios:
+    needs: prepare-source
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - name: Xcode version
+        run: xcodebuild -version
+      - name: Build unsigned experimental IPA (not directly installable)
+        run: |
+          set -euo pipefail
+          xcodebuild -project LinkCapture.xcodeproj -scheme LinkCapture -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build/device CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
+          mkdir -p build/package/Payload
+          cp -R build/device/Build/Products/Release-iphoneos/LinkCapture.app build/package/Payload/
+          cd build/package
+          zip -qr ../LinkCapture-experimental-UNSIGNED.ipa Payload
+      - name: Select iPhone simulator
+        run: |
+          DEVICE_ID=$(xcrun simctl list devices available -j | python3 -c 'import json,sys; d=json.load(sys.stdin); print(next(x["udid"] for values in d["devices"].values() for x in values if "iPhone" in x["name"]))')
+          echo "SIMULATOR_ID=$DEVICE_ID" >> "$GITHUB_ENV"
+      - name: Unit tests
+        run: |
+          set -euo pipefail
+          xcodebuild -project LinkCapture.xcodeproj -scheme LinkCapture -destination "platform=iOS Simulator,id=$SIMULATOR_ID" -derivedDataPath build/simulator -resultBundlePath build/UnitTests.xcresult -only-testing:LinkCaptureTests/PolicyTests -only-testing:LinkCaptureTests/CompatibilityTests CODE_SIGNING_ALLOWED=NO test
+      - name: Real network validation (may expose incompatibility)
+        if: github.event_name == 'workflow_dispatch' && inputs.network_tests
+        env:
+          SIMCTL_CHILD_LINKCAPTURE_NETWORK_TESTS: '1'
+        run: |
+          set -euo pipefail
+          LINKCAPTURE_NETWORK_TESTS=1 xcodebuild -project LinkCapture.xcodeproj -scheme LinkCapture -destination "platform=iOS Simulator,id=$SIMULATOR_ID" -derivedDataPath build/simulator -resultBundlePath build/NetworkTests.xcresult -only-testing:LinkCaptureTests/NetworkTests CODE_SIGNING_ALLOWED=NO test
+      - name: Preserve IPA and test evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: LinkCapture-experimental-and-test-results
+          path: |
+            build/LinkCapture-experimental-UNSIGNED.ipa
+            build/*.xcresult
+          retention-days: 7
+  compatibility:
+    needs: prepare-source
+    if: github.event_name == 'workflow_dispatch'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { runner: macos-15, ios: '16' }
+          - { runner: macos-15, ios: '17' }
+          - { runner: macos-15, ios: '18' }
+          - { runner: macos-26, ios: '26' }
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - name: Record installed toolchain and simulators
+        run: |
+          mkdir -p build/compatibility
+          xcodebuild -version | tee build/compatibility/xcode.txt
+          xcrun simctl list runtimes | tee build/compatibility/runtimes.txt
+      - name: Compatibility on actually available runtimes
+        env:
+          REQUESTED_IOS: ${{ matrix.ios }}
+          FULL_DEVICE_MATRIX: ${{ inputs.full_device_matrix }}
+        run: python3 scripts/compatibility.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: compatibility-ios-${{ matrix.ios }}
+          path: build/compatibility/
+          retention-days: 7
