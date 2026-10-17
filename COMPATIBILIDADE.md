@@ -18,7 +18,7 @@ Não existe expectativa de instalar iOS 16 em modelos que saíram com uma versã
 | WKWebView, WKNavigationDelegate, WKUIDelegate | Anterior a iOS 16 | Navegação normal em todos os alvos |
 | WKWebsiteDataStore.nonPersistent | Anterior a iOS 16 | Isolamento de cookies da sessão |
 | WKWebsiteDataStore.proxyConfigurations | iOS 17+ no cabeçalho público WebKit | Guard de disponibilidade; nunca chamada em iOS 16 |
-| Network.ProxyConfiguration, SOCKSv5, credencial, allowFailover | iOS 17+ | Usado somente após guard iOS 17 |
+| Network nw_proxy_config_* públicas, SOCKSv5, credencial, failover | iOS 17+ | Usado somente após guard iOS 17 |
 | NWListener/NWConnection/NWPathMonitor | Anterior a iOS 16 | Loopback, TCP e observação Wi-Fi/celular |
 | URLSession async/await | iOS 15+ | DoH no iOS 16+ |
 | NavigationStack/LabeledContent/SwiftUI | iOS 16+ | Base do layout nativo |
@@ -50,4 +50,5 @@ Em pelo menos iPhone 14 (notch), 14 Pro (Dynamic Island), um 15/16 e 17 Pro Max,
 
 ## Evidência atual
 
-Verificações locais Windows: estrutura de Info.plist e scheme XML; script Python sintaticamente válido; inspeção de guards iOS 17; DNS/HTTPS externo registrado em JSON. Nenhuma compilação Swift, teste XCTest ou execução no iPhone foi concluída ainda. O Windows não tem Xcode; execução no GitHub depende de login e disponibilidade do repositório autorizado.
+Verificações locais Windows: estrutura de Info.plist e scheme XML; script Python sintaticamente válido; inspeção de guards iOS 17; DNS/HTTPS externo registrado em JSON. Build arm64 aprovado no GitHub Actions com Xcode 16.4, SDK 18.5, deployment target 16.0. Testes de políticas e inicialização/layout aprovados nos runtimes disponíveis iOS 18 e 26. Runtimes 16/17 ausentes no runner: NÃO TESTADOS. SIGSEGV no wrapper Swift do setter de proxy corrigido usando a propriedade pública refinada e APIs C públicas. Rede iOS 18.5: 5/6 aprovados, sem crash; caso 62qpix chegou a /405, não /launch, e continua reprovado. Nenhuma validação em iPhone físico foi concluída.
+
