@@ -1,6 +1,10 @@
 # Instalar no iPhone pelo Windows sem conta Developer paga
 
-Estado: instalação ainda não executada. O projeto precisa compilar primeiro. Não há IPA pronta neste pacote de fontes.
+Estado: build aprovado e IPA experimental sem assinatura disponível. Instalação e assinatura no iPhone ainda não executadas.
+
+Download direto: https://github.com/largartozaulnj/linkcapture-ios-native/releases/download/experimental-run-39008738033/LinkCapture-experimental-UNSIGNED.ipa
+
+Página da prévia e BUILD-INFO.json: https://github.com/largartozaulnj/linkcapture-ios-native/releases/tag/experimental-run-39008738033
 
 1. Depois que o workflow passar, abra a execução no GitHub Actions e baixe o artifact `LinkCapture-experimental-and-test-results`. Descompacte; procure `LinkCapture-experimental-UNSIGNED.ipa`. Confira a execução e o commit correspondente antes de instalar.
 2. No Windows, siga o guia oficial para instalar **AltServer + AltStore Classic**: https://faq.altstore.io/altstore-classic/how-to-install-altstore-windows . Instale as versões de iTunes/iCloud indicadas no guia; não use tutoriais com certificados compartilhados ou ferramentas desconhecidas.
