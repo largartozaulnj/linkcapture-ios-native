@@ -1,0 +1,73 @@
+name: Publish unsigned experimental download
+on:
+  workflow_dispatch:
+    inputs:
+      build_run:
+        description: 'ID da execução que gerou a IPA'
+        required: true
+        default: '39004968676'
+permissions:
+  contents: write
+  actions: read
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      BUILD_RUN: ${{ inputs.build_run }}
+    steps:
+      - name: Download existing build and inspect IPA without executing it
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$BUILD_RUN" =~ ^[0-9]+$ ]]
+          mkdir -p package
+          gh run download "$BUILD_RUN" -n LinkCapture-experimental-and-test-results -D package
+          gh api "repos/$GH_REPO/actions/runs/$BUILD_RUN" > package/run.json
+          gh api "repos/$GH_REPO/actions/runs/$BUILD_RUN/jobs" > package/jobs.json
+          python3 - <<'PY'
+          import json, plistlib, hashlib
+          from pathlib import Path
+          from zipfile import ZipFile
+          jobs=json.loads(Path('package/jobs.json').read_text())['jobs']
+          job=next(j for j in jobs if j['name']=='ios')
+          steps={s['name']:s['conclusion'] for s in job['steps']}
+          assert steps.get('Build unsigned experimental IPA (not directly installable)')=='success', 'Build failed'
+          assert steps.get('Unit tests')=='success', 'Unit tests did not pass'
+          ipa=Path('package/LinkCapture-experimental-UNSIGNED.ipa')
+          assert ipa.is_file()
+          with ZipFile(ipa) as archive:
+              assert archive.testzip() is None
+              info=plistlib.loads(archive.read('Payload/LinkCapture.app/Info.plist'))
+              assert info['CFBundlePackageType']=='APPL'
+              assert float(info['MinimumOSVersion'])==16.0
+              assert len(archive.read('Payload/LinkCapture.app/LinkCapture'))>0
+          run=json.loads(Path('package/run.json').read_text())
+          result={'buildRun':run['html_url'],'triggerCommit':run['head_sha'],'minimumIOS':info['MinimumOSVersion'],
+                  'sdk':info.get('DTSDKName'),'xcode':info.get('DTXcode'),'version':info.get('CFBundleShortVersionString'),
+                  'bundleIdentifier':info['CFBundleIdentifier'],'sha256':hashlib.sha256(ipa.read_bytes()).hexdigest(),
+                  'signing':'UNSIGNED — requires local re-signing','steps':steps,'realIPhoneDNSValidation':'NOT EXECUTED'}
+          Path('package/BUILD-INFO.json').write_text(json.dumps(result,indent=2))
+          print(json.dumps(result,indent=2))
+          PY
+      - name: Publish prerelease of existing unsigned binary
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="experimental-run-$BUILD_RUN"
+          SOURCE_SHA=$(python3 -c "import json;print(json.load(open('package/run.json'))['head_sha'])")
+          cat > package/NOTES.md <<'TXT'
+          LinkCapture nativo experimental. IPA sem assinatura, destinada à assinatura local gratuita pelo AltStore Classic.
+          Build e testes unitários conferidos. iOS mínimo declarado: 16.0.
+          Recuperação DNS e comportamento de 62qpix.vip NÃO validados em iPhone real.
+          No iOS 16, proxy por WKWebView não está disponível; há navegação direta e diagnóstico DNS.
+          Conta Apple e certificados não são enviados ao GitHub. Assinatura gratuita normalmente exige renovação a cada sete dias.
+          Consulte BUILD-INFO.json e INSTALAR-NO-WINDOWS.md.
+          TXT
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" package/LinkCapture-experimental-UNSIGNED.ipa package/BUILD-INFO.json --clobber
+          else
+            gh release create "$TAG" package/LinkCapture-experimental-UNSIGNED.ipa package/BUILD-INFO.json --target "$SOURCE_SHA" --title "LinkCapture experimental — build $BUILD_RUN (unsigned)" --prerelease --notes-file package/NOTES.md
+          fi
