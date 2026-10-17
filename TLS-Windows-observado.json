@@ -1,0 +1,38 @@
+[
+  {
+    "ip": "104.18.22.74",
+    "path": "/",
+    "status": 200,
+    "tlsAuthorized": true,
+    "protocol": "TLSv1.3",
+    "title": "",
+    "launchMentioned": false
+  },
+  {
+    "ip": "104.18.22.74",
+    "path": "/launch",
+    "status": 200,
+    "tlsAuthorized": true,
+    "protocol": "TLSv1.3",
+    "title": "",
+    "launchMentioned": false
+  },
+  {
+    "ip": "104.18.23.74",
+    "path": "/",
+    "status": 200,
+    "tlsAuthorized": true,
+    "protocol": "TLSv1.3",
+    "title": "",
+    "launchMentioned": false
+  },
+  {
+    "ip": "104.18.23.74",
+    "path": "/launch",
+    "status": 200,
+    "tlsAuthorized": true,
+    "protocol": "TLSv1.3",
+    "title": "",
+    "launchMentioned": false
+  }
+]

@@ -1,0 +1,163 @@
+{
+  "time": "2026-10-17T04:31:44.774Z",
+  "rows": [
+    {
+      "provider": "Google",
+      "type": "A",
+      "http": 200,
+      "body": {
+        "Status": 0,
+        "TC": false,
+        "RD": true,
+        "RA": true,
+        "AD": false,
+        "CD": false,
+        "Question": [
+          {
+            "name": "62qpix.vip.",
+            "type": 1
+          }
+        ],
+        "Answer": [
+          {
+            "name": "62qpix.vip.",
+            "type": 5,
+            "TTL": 300,
+            "data": "zhu-6187298.l-g-m-2.com."
+          },
+          {
+            "name": "zhu-6187298.l-g-m-2.com.",
+            "type": 1,
+            "TTL": 300,
+            "data": "104.18.22.74"
+          },
+          {
+            "name": "zhu-6187298.l-g-m-2.com.",
+            "type": 1,
+            "TTL": 300,
+            "data": "104.18.23.74"
+          }
+        ],
+        "Comment": "Response from 172.64.34.162."
+      }
+    },
+    {
+      "provider": "Google",
+      "type": "AAAA",
+      "http": 200,
+      "body": {
+        "Status": 0,
+        "TC": false,
+        "RD": true,
+        "RA": true,
+        "AD": false,
+        "CD": false,
+        "Question": [
+          {
+            "name": "62qpix.vip.",
+            "type": 28
+          }
+        ],
+        "Answer": [
+          {
+            "name": "62qpix.vip.",
+            "type": 5,
+            "TTL": 300,
+            "data": "zhu-6187298.l-g-m-2.com."
+          },
+          {
+            "name": "zhu-6187298.l-g-m-2.com.",
+            "type": 28,
+            "TTL": 300,
+            "data": "2606:4700::6812:174a"
+          },
+          {
+            "name": "zhu-6187298.l-g-m-2.com.",
+            "type": 28,
+            "TTL": 300,
+            "data": "2606:4700::6812:164a"
+          }
+        ],
+        "Comment": "Response from 108.162.195.132."
+      }
+    },
+    {
+      "provider": "Cloudflare",
+      "type": "A",
+      "http": 200,
+      "body": {
+        "Status": 0,
+        "TC": false,
+        "RD": true,
+        "RA": true,
+        "AD": false,
+        "CD": false,
+        "Question": [
+          {
+            "name": "62qpix.vip",
+            "type": 1
+          }
+        ],
+        "Answer": [
+          {
+            "name": "62qpix.vip",
+            "type": 5,
+            "TTL": 300,
+            "data": "zhu-6187298.l-g-m-2.com."
+          },
+          {
+            "name": "zhu-6187298.l-g-m-2.com",
+            "type": 1,
+            "TTL": 300,
+            "data": "104.18.22.74"
+          },
+          {
+            "name": "zhu-6187298.l-g-m-2.com",
+            "type": 1,
+            "TTL": 300,
+            "data": "104.18.23.74"
+          }
+        ]
+      }
+    },
+    {
+      "provider": "Cloudflare",
+      "type": "AAAA",
+      "http": 200,
+      "body": {
+        "Status": 0,
+        "TC": false,
+        "RD": true,
+        "RA": true,
+        "AD": false,
+        "CD": false,
+        "Question": [
+          {
+            "name": "62qpix.vip",
+            "type": 28
+          }
+        ],
+        "Answer": [
+          {
+            "name": "62qpix.vip",
+            "type": 5,
+            "TTL": 300,
+            "data": "zhu-6187298.l-g-m-2.com."
+          },
+          {
+            "name": "zhu-6187298.l-g-m-2.com",
+            "type": 28,
+            "TTL": 300,
+            "data": "2606:4700::6812:174a"
+          },
+          {
+            "name": "zhu-6187298.l-g-m-2.com",
+            "type": 28,
+            "TTL": 300,
+            "data": "2606:4700::6812:164a"
+          }
+        ]
+      }
+    }
+  ]
+}
