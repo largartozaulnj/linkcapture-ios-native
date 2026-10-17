@@ -93,7 +93,7 @@ import Security
     }
     func normalMode() {
         cancelTasks(); generation = UUID(); webView.stopLoading(); proxy.closeConnections()
-        if #available(iOS 17.0, *) { store.proxyConfigurations = [] }
+        if #available(iOS 17.0, *) { store.__proxyConfigurations = [] }
         proxyActive = false; mode = "Direto"; rebuild()
         message = "Modo direto. O próximo link usará o DNS do sistema."; recovering = false; loading = false
     }
@@ -158,10 +158,7 @@ import Security
                     self.proxy.start { continuation.resume(with: $0) }
                 }
                 guard !Task.isCancelled, token == self.generation else { return }
-                var config = ProxyConfiguration(socksv5Proxy: .hostPort(host: .ipv4(.loopback), port: NWEndpoint.Port(rawValue: endpoint.port)!))
-                config.allowFailover = false
-                config.applyCredential(username: endpoint.username, password: endpoint.password)
-                self.store.proxyConfigurations = [config]
+                Self.configureProxy(store: self.store, endpoint: endpoint)
                 self.proxyActive = true; self.mode = "Proxy local / \(provider.rawValue)"
                 self.rebuild(); self.redirectCount = 0
                 self.load(URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 45))
@@ -296,6 +293,18 @@ import Security
         Resultado: \(result)
         \(diagnostics.joined(separator: "\n"))
         """
+    }
+    // NS_REFINED_FOR_SWIFT imports the PUBLIC Objective-C property as
+    // __proxyConfigurations. Avoid the SDK 18.5 Swift overlay setter which
+    // produced a null-function SIGSEGV in the real simulator network test.
+    // These are documented public Network C APIs, not private selectors/KVC.
+    @available(iOS 17.0, *)
+    static func configureProxy(store: WKWebsiteDataStore, endpoint: LocalSOCKSProxy.Endpoint) {
+        let host = nw_endpoint_create_host("127.0.0.1", String(endpoint.port))
+        let configuration = nw_proxy_config_create_socksv5(host)
+        nw_proxy_config_set_failover_allowed(configuration, false)
+        nw_proxy_config_set_username_and_password(configuration, endpoint.username, endpoint.password)
+        store.__proxyConfigurations = [configuration]
     }
     var proxyCapability: String {
         if #available(iOS 17.0, *) { return "Proxy local experimental disponível pela API pública (iOS 17+)" }
