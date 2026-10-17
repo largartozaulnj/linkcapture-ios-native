@@ -22,14 +22,9 @@ import Darwin
             let resolver = DNSResolver(log: { print($0) })
             let local = LocalSOCKSProxy(resolver: resolver, log: { print($0) }); proxy = local
             let endpoint = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<LocalSOCKSProxy.Endpoint, Error>) in local.start { continuation.resume(with: $0) } }
-            print("PROXY STEP: construct public Network configuration"); fflush(stdout)
-            var configuration = ProxyConfiguration(socksv5Proxy: .hostPort(host: .ipv4(.loopback), port: NWEndpoint.Port(rawValue: endpoint.port)!))
-            print("PROXY STEP: disable failover"); fflush(stdout)
-            configuration.allowFailover = false
-            print("PROXY STEP: apply credential"); fflush(stdout)
-            configuration.applyCredential(username: endpoint.username, password: endpoint.password)
-            print("PROXY STEP: assign WKWebsiteDataStore"); fflush(stdout)
-            store.proxyConfigurations = [configuration]
+            print("PROXY STEP: assign public refined property via Network C APIs"); fflush(stdout)
+            BrowserModel.configureProxy(store: store, endpoint: endpoint)
+            print("PROXY STEP: assignment returned"); fflush(stdout)
         }
         print("PROXY STEP: create WKWebView"); fflush(stdout)
         let config = WKWebViewConfiguration(); config.websiteDataStore = store
