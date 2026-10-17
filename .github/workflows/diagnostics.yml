@@ -1,6 +1,11 @@
-name: Inspect simulator test failure
+name: Export simulator test evidence
 on:
   workflow_dispatch:
+    inputs:
+      build_run:
+        description: Build run ID whose evidence should be exported
+        required: true
+        default: "39008738033"
 permissions:
   actions: read
   contents: write
@@ -11,16 +16,20 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       GH_REPO: ${{ github.repository }}
+      BUILD_RUN: ${{ inputs.build_run }}
     steps:
       - name: Inspect existing XCTest evidence without repeating navigation
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p package report
-          gh run download 39006863649 -n LinkCapture-experimental-and-test-results -D package
-          xcrun xcresulttool get test-results summary --path package/NetworkTests.xcresult > report/test-run-2-summary.json
+          [[ "$BUILD_RUN" =~ ^[0-9]+$ ]]
+          gh run download "$BUILD_RUN" -n LinkCapture-experimental-and-test-results -D package
+          xcrun xcresulttool get test-results summary --path package/NetworkTests.xcresult > report/network-test-summary.json
           xcrun xcresulttool export diagnostics --path package/NetworkTests.xcresult --output-path package/diagnostics
-          python3 - <<'PY'
+          xcrun xcresulttool get test-results summary --path package/UnitTests.xcresult > report/unit-test-summary.json
+          xcrun xcresulttool export attachments --path package/NetworkTests.xcresult --output-path package/attachments
+          python3 - <<'PY' 
           import json
           from pathlib import Path
           reports=[]
@@ -31,6 +40,7 @@ jobs:
               if file.suffix=='.ips':
                   try:
                       data=json.loads(text.split('\n',1)[1])
+                      if data.get('procName') != 'LinkCapture': continue
                       thread=data.get('faultingThread',0)
                       frames=data.get('threads',[{}])[thread].get('frames',[])
                       reports.append({'name':file.name,'process':data.get('procName'),'exception':data.get('exception'),'termination':data.get('termination'),
@@ -40,8 +50,23 @@ jobs:
               else:
                   lines=text.splitlines()
                   reports.append({'name':file.name,'details':[line for line in lines if any(x in line for x in ('Exception Type:','Termination Reason:','Triggered by Thread:','LinkCapture','assert','dispatch_assert'))][:45]})
-          Path('report/test-run-2-crashes.json').write_text(json.dumps(reports,indent=2))
+          Path('report/network-test-crashes.json').write_text(json.dumps(reports,indent=2))
           print(json.dumps(reports,indent=2))
           PY
-          gh release upload experimental-run-39004968676 report/test-run-2-summary.json report/test-run-2-crashes.json --clobber
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          observations=[]
+          for file in Path('package/attachments').rglob('*'):
+              if not file.is_file() or file.suffix != '.json': continue
+              try:
+                  obj=json.loads(file.read_text())
+                  if isinstance(obj,dict) and 'url' in obj and 'graphics' in obj and 'redirects' in obj:
+                      observations.append(obj)
+              except (ValueError,UnicodeError): pass
+          Path('report/network-observations.json').write_text(json.dumps(observations,indent=2))
+          print(json.dumps(observations,indent=2))
+          PY
+          gh release upload "experimental-run-$BUILD_RUN" report/*.json --clobber
+
 
