@@ -2,6 +2,7 @@ import XCTest
 import WebKit
 import Network
 import SwiftUI
+import Darwin
 @testable import LinkCapture
 
 // Explicit opt-in: these tests contact public sites and must never be replaced
@@ -21,11 +22,16 @@ import SwiftUI
             let resolver = DNSResolver(log: { print($0) })
             let local = LocalSOCKSProxy(resolver: resolver, log: { print($0) }); proxy = local
             let endpoint = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<LocalSOCKSProxy.Endpoint, Error>) in local.start { continuation.resume(with: $0) } }
+            print("PROXY STEP: construct public Network configuration"); fflush(stdout)
             var configuration = ProxyConfiguration(socksv5Proxy: .hostPort(host: .ipv4(.loopback), port: NWEndpoint.Port(rawValue: endpoint.port)!))
+            print("PROXY STEP: disable failover"); fflush(stdout)
             configuration.allowFailover = false
+            print("PROXY STEP: apply credential"); fflush(stdout)
             configuration.applyCredential(username: endpoint.username, password: endpoint.password)
+            print("PROXY STEP: assign WKWebsiteDataStore"); fflush(stdout)
             store.proxyConfigurations = [configuration]
         }
+        print("PROXY STEP: create WKWebView"); fflush(stdout)
         let config = WKWebViewConfiguration(); config.websiteDataStore = store
         let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 390, height: 700), configuration: config)
         view = webView
@@ -122,3 +128,4 @@ import SwiftUI
         observation.url = view.url?.absoluteString ?? ""; continuation.resume(returning: observation)
     }
 }
+
