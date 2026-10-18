@@ -2,6 +2,12 @@
 
 Projeto independente Swift/SwiftUI + WKWebView, iPhone arm64, mínimo **iOS 16.0**. Interface responsiva, safe areas, navegação interna, barra de endereço, voltar/avançar, início, atualizar/parar, diagnóstico e controles recolhíveis. URLs, caminhos e parâmetros são preservados. PWA e Android não foram alterados; não há VPS ou mensalidade.
 
+## Assinatura e atualizações — 0.2.0 (2)
+
+[Fonte oficial e botão Adicionar ao AltStore](https://largartozaulnj.github.io/linkcapture-ios-native/) · [source.json](https://largartozaulnj.github.io/linkcapture-ios-native/source.json) · [Guia completo](ASSINATURA-E-ATUALIZACOES.md). Catálogo gerado a partir do Info.plist e dos bytes reais da IPA, com histórico, tamanho e SHA-256. Atualizações exigem sua autorização no AltStore.
+
+Menu → Assinatura e Atualizações: informe o vencimento real exibido pelo AltStore, confirme em RENOVEI PELO ALTSTORE e autorize as notificações. Lembretes locais de 6 a 0 dias, horário configurável, funcionam offline após agendamento. Abrir o app não estende a validade. A leitura automática confiável do prazo não foi implementada; a data é manual. Assinatura gratuita ainda precisa de renovação pelo AltServer. Associação da fonte, atualização preservando dados e entrega das notificações precisam de validação no iPhone real.
+
 ## Interface atualizada
 
 Barra de endereço compacta e arredondada, domínio atual e edição da URL completa ao tocar, abrir pelo botão/teclado, carregamento discreto e atualizar/parar. Navegação inferior com voltar, avançar, início, atualizar e menu. Diagnóstico, conexão, copiar, compartilhar, colar e recolher ficam no menu. Sem título/corrente no cabeçalho, segunda barra de status ou marca Google. Layout escuro com acento próprio e safe areas do iPhone.
@@ -10,11 +16,11 @@ Motor, wrapper WKWebView, SOCKS, DNS, TLS, política de URLs, Bundle ID, projeto
 
 ## Download e resultado real
 
-- [Prévia corrigida e IPA unsigned](https://github.com/largartozaulnj/linkcapture-ios-native/releases/tag/experimental-run-39082906544)
-- [Build e testes](https://github.com/largartozaulnj/linkcapture-ios-native/actions/runs/39082906544)
+- [Prévia corrigida e IPA unsigned](https://github.com/largartozaulnj/linkcapture-ios-native/releases/tag/experimental-run-39085485364)
+- [Build e testes](https://github.com/largartozaulnj/linkcapture-ios-native/actions/runs/39085485364)
 - [Instalar pelo Windows](INSTALAR-NO-WINDOWS.md)
 
-Build iPhone aprovado com **Xcode 16.4 / SDK 18.5**, deployment target **16.0**, commit `a6a7a47e20c947c7d7fade59886eb8b2f9d31f22`. Sete testes de políticas e inicialização/layout aprovados; cobertura nos runtimes disponíveis iOS 18 e 26. Runtimes 16/17 ausentes: **NÃO TESTADOS**. Validação física da interface reformulada ainda pendente.
+Build iPhone aprovado com **Xcode 16.4 / SDK 18.5**, deployment target **16.0**, commit `b5bfd425eba3f04783648f290c65dd2127d4bdbb`. Quinze testes unitários de políticas, renovação, catálogo e inicialização/layout aprovados; cobertura nos runtimes disponíveis iOS 18 e 26. Runtimes 16/17 ausentes: **NÃO TESTADOS**. Validação física da interface reformulada ainda pendente.
 
 **Rede no simulador iPhone 16 Pro / iOS 18.5: 5 de 6 testes aprovados.** Passaram navegação normal com `?sd=3`, transporte HTTPS real pelo proxy local, rejeição de certificado expirado, NXDOMAIN e registro do baseline direto. O baseline só registra observações, sem exigir sucesso.
 
