@@ -2,17 +2,23 @@
 
 Projeto independente Swift/SwiftUI + WKWebView, iPhone arm64, mínimo **iOS 16.0**. Interface responsiva, safe areas, navegação interna, barra de endereço, voltar/avançar, início, atualizar/parar, diagnóstico e controles recolhíveis. URLs, caminhos e parâmetros são preservados. PWA e Android não foram alterados; não há VPS ou mensalidade.
 
+## Interface atualizada
+
+Barra de endereço compacta e arredondada, domínio atual e edição da URL completa ao tocar, abrir pelo botão/teclado, carregamento discreto e atualizar/parar. Navegação inferior com voltar, avançar, início, atualizar e menu. Diagnóstico, conexão, copiar, compartilhar, colar e recolher ficam no menu. Sem título/corrente no cabeçalho, segunda barra de status ou marca Google. Layout escuro com acento próprio e safe areas do iPhone.
+
+Motor, wrapper WKWebView, SOCKS, DNS, TLS, política de URLs, Bundle ID, projeto e assinatura preservados. Comparação SHA-256 nos commits em visual-engine-integrity.json. Detalhes em ATUALIZACAO-VISUAL.md. Testes de layout compacto/largo aprovados após corrigir compressão das barras; alturas de toque permanecem fixas, e o viewport ocupa o restante.
+
 ## Download e resultado real
 
-- [Prévia corrigida e IPA unsigned](https://github.com/largartozaulnj/linkcapture-ios-native/releases/tag/experimental-run-39008738033)
-- [Build e testes](https://github.com/largartozaulnj/linkcapture-ios-native/actions/runs/39008738033)
+- [Prévia corrigida e IPA unsigned](https://github.com/largartozaulnj/linkcapture-ios-native/releases/tag/experimental-run-39082906544)
+- [Build e testes](https://github.com/largartozaulnj/linkcapture-ios-native/actions/runs/39082906544)
 - [Instalar pelo Windows](INSTALAR-NO-WINDOWS.md)
 
-Build iPhone aprovado com **Xcode 16.4 / SDK 18.5**, deployment target **16.0**, commit `b545748dafea5f8f32c558f91d7e09464425083c`. Testes de políticas e inicialização/layout aprovados em runtimes disponíveis iOS 18 e 26. Runtimes 16/17 ausentes: **NÃO TESTADOS**. Nenhum iPhone físico foi validado.
+Build iPhone aprovado com **Xcode 16.4 / SDK 18.5**, deployment target **16.0**, commit `a6a7a47e20c947c7d7fade59886eb8b2f9d31f22`. Sete testes de políticas e inicialização/layout aprovados; cobertura nos runtimes disponíveis iOS 18 e 26. Runtimes 16/17 ausentes: **NÃO TESTADOS**. Validação física da interface reformulada ainda pendente.
 
 **Rede no simulador iPhone 16 Pro / iOS 18.5: 5 de 6 testes aprovados.** Passaram navegação normal com `?sd=3`, transporte HTTPS real pelo proxy local, rejeição de certificado expirado, NXDOMAIN e registro do baseline direto. O baseline só registra observações, sem exigir sucesso.
 
-**62qpix.vip NÃO foi recuperado como no Android.** DNS alternativo resolveu o domínio, o proxy conectou por HTTPS e carregou subrecursos, mas a URL terminou em `/405`, não `/launch`. Essa asserção permanece reprovada; o workflow geral fica vermelho corretamente. A rota `/405` não deve ser confundida com status HTTP 405. A razão da diferença não foi determinada. IP da nuvem, políticas do site e diferenças de cliente são hipóteses, não conclusões.
+**No simulador do GitHub, 62qpix.vip não reproduziu o destino /launch.** DNS alternativo resolveu o domínio, o proxy conectou por HTTPS e carregou subrecursos, mas a URL terminou em `/405`, não `/launch`. Essa asserção permanece reprovada; o workflow geral fica vermelho corretamente. A rota `/405` não deve ser confundida com status HTTP 405. A razão da diferença não foi determinada. IP da nuvem, políticas do site e diferenças de cliente são hipóteses, não conclusões.
 
 A prévia anterior tinha SIGSEGV no setter Swift de proxy em iOS 18.5. A correção usa as funções C públicas de Network e a propriedade pública marcada `NS_REFINED_FOR_SWIFT` no WebKit, importada como `__proxyConfigurations`. Não usa KVC, selectors privados ou desativação TLS. Os seis testes de rede executaram após a correção. Use o IPA da prévia corrigida. As pastas de fontes e o projeto Xcode são a referência atual; o ZIP de bootstrap antigo da raiz é obsoleto.
 
