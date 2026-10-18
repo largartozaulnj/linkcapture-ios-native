@@ -1,10 +1,10 @@
 # Instalar no iPhone pelo Windows sem conta Developer paga
 
-Estado: atualização visual; mesma identidade do aplicativo. Build aprovado; IPA experimental destinada à assinatura pelo mesmo AltStore Classic. Instalação e assinatura no iPhone ainda não executadas.
+Estado: versão 0.2.0 (2), fonte AltStore e lembretes; mesma identidade do aplicativo. Build aprovado; IPA experimental destinada à assinatura pelo mesmo AltStore Classic. Instalação e assinatura no iPhone ainda não executadas.
 
-Download direto: https://github.com/largartozaulnj/linkcapture-ios-native/releases/download/experimental-run-39082906544/LinkCapture-experimental-UNSIGNED.ipa
+Download direto: https://github.com/largartozaulnj/linkcapture-ios-native/releases/download/experimental-run-39085485364/LinkCapture-experimental-UNSIGNED.ipa
 
-Página da prévia e BUILD-INFO.json: https://github.com/largartozaulnj/linkcapture-ios-native/releases/tag/experimental-run-39082906544
+Página da prévia e BUILD-INFO.json: https://github.com/largartozaulnj/linkcapture-ios-native/releases/tag/experimental-run-39085485364
 
 1. Depois que o workflow passar, abra a execução no GitHub Actions e baixe o artifact `LinkCapture-experimental-and-test-results`. Descompacte; procure `LinkCapture-experimental-UNSIGNED.ipa`. Confira a execução e o commit correspondente antes de instalar.
 2. No Windows, siga o guia oficial para instalar **AltServer + AltStore Classic**: https://faq.altstore.io/altstore-classic/how-to-install-altstore-windows . Instale as versões de iTunes/iCloud indicadas no guia; não use tutoriais com certificados compartilhados ou ferramentas desconhecidas.
@@ -12,6 +12,12 @@ Página da prévia e BUILD-INFO.json: https://github.com/largartozaulnj/linkcapt
 4. No iPhone, siga a solicitação de confiança do perfil e habilite Modo de Desenvolvedor, quando exigido, em Ajustes → Privacidade e Segurança. O iOS pode exigir reinício e confirmação.
 5. Copie a IPA para o aplicativo Arquivos do iPhone por um meio de sua preferência. Abra AltStore Classic → My Apps → `+` e selecione a IPA. AltStore fará a assinatura de desenvolvimento gratuita e a instalação. A IPA unsigned não é instalável diretamente por Safari ou simples download.
 6. Abra LinkCapture. Teste `https://example.com/?sd=3` e depois `https://62qpix.vip`. No Diagnóstico, compare modo direto e proxy local (somente iOS 17+). Registre URL final, erro, estratégia e conteúdo visível. Testar `/launch` explicitamente não comprova que houve redirecionamento automático.
+
+## Fonte oficial e lembretes
+
+No Safari do iPhone, abra https://largartozaulnj.github.io/linkcapture-ios-native/ e toque em Adicionar fonte. Alternativamente, AltStore Classic → Sources → + → cole https://largartozaulnj.github.io/linkcapture-ios-native/source.json . Revise a fonte e autorize a instalação/atualização. Use a mesma conta Apple e AltStore da instalação existente; não desinstale para tentar associar a fonte. Confira a associação em My Apps e a preservação dos dados. Essa associação ainda requer teste no seu iPhone.
+
+LinkCapture → menu → Assinatura e Atualizações → RENOVEI PELO ALTSTORE: confirme a data/hora de vencimento que o AltStore informa. Configurar lembretes → Solicitar permissão → escolha horário e avisos. Repita a confirmação da data depois de cada renovação real. Os alertas não renovam a assinatura e o app não inventa sete dias a partir da abertura. Guia: ASSINATURA-E-ATUALIZACOES.md.
 
 ## Renovação
 
