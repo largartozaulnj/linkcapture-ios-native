@@ -52,3 +52,7 @@ Em pelo menos iPhone 14 (notch), 14 Pro (Dynamic Island), um 15/16 e 17 Pro Max,
 
 Verificações locais Windows: estrutura de Info.plist e scheme XML; script Python sintaticamente válido; inspeção de guards iOS 17; DNS/HTTPS externo registrado em JSON. Build arm64 aprovado no GitHub Actions com Xcode 16.4, SDK 18.5, deployment target 16.0. Testes de políticas e inicialização/layout aprovados nos runtimes disponíveis iOS 18 e 26. Runtimes 16/17 ausentes no runner: NÃO TESTADOS. SIGSEGV no wrapper Swift do setter de proxy corrigido usando a propriedade pública refinada e APIs C públicas. Rede iOS 18.5: 5/6 aprovados, sem crash; caso 62qpix chegou a /405, não /launch, e continua reprovado. Nenhuma validação em iPhone físico foi concluída.
 
+
+## Lembretes e catálogo — 0.2.0 (2)
+
+Oito testes adicionais cobrem validade desconhecida, sete notificações únicas, datas passadas, desligamento, modo urgente, dia zero antes do vencimento, renovação, horário local/DST, persistência e versões/builds. UserNotifications e as telas usam APIs públicas disponíveis em iOS 16. Permissão, Foco, entrega offline, associação da fonte no AltStore e atualização preservando dados dependem do iPhone real. Não são declarados aprovados por testes de planejamento.
