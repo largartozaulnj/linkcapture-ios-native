@@ -43,7 +43,7 @@ struct NativeWebView: UIViewRepresentable {
                 if isHome { home }
                 if model.recovering { recovery }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity).clipped()
+            .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity).clipped()
             if !model.controlsHidden {
                 if !model.loading && !model.recovering && model.result == "Falha ou inconclusivo" {
                     HStack(spacing: 10) {
@@ -101,9 +101,10 @@ struct NativeWebView: UIViewRepresentable {
                 }.foregroundStyle(.primary).accessibilityLabel(model.loading ? "Parar carregamento" : "Atualizar página")
             }
         }
+        .frame(height: 44).fixedSize(horizontal: false, vertical: true)
         .background(field, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
         .padding(.horizontal, 12).padding(.vertical, 6).background(chrome)
-        .accessibilityIdentifier("addressBar")
+        .accessibilityIdentifier("addressBar").layoutPriority(1)
     }
 
     private var bottomBar: some View {
@@ -128,9 +129,10 @@ struct NativeWebView: UIViewRepresentable {
                     .frame(maxWidth: .infinity).frame(height: 56).contentShape(Rectangle())
             }.accessibilityLabel("Menu de opções").accessibilityIdentifier("options")
         }
+        .frame(height: 56).fixedSize(horizontal: false, vertical: true)
         .foregroundStyle(Color(white: 0.88)).background(chrome)
         .overlay(alignment: .top) { Rectangle().fill(Color.white.opacity(0.07)).frame(height: 0.5) }
-        .accessibilityIdentifier("bottomBar")
+        .accessibilityIdentifier("bottomBar").layoutPriority(1)
     }
 
     private func nav(_ symbol: String, _ label: String, disabled: Bool = false, action: @escaping () -> Void) -> some View {
@@ -150,13 +152,17 @@ struct NativeWebView: UIViewRepresentable {
         withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.18)) { model.controlsHidden = hidden }
     }
     private var home: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "globe.americas.fill").font(.system(size: 42, weight: .light)).foregroundStyle(accent)
-            Text("Seu próximo destino").font(.title2.weight(.semibold))
-            Text("Digite ou cole um endereço para navegar.").font(.subheadline).foregroundStyle(.secondary).multilineTextAlignment(.center)
-            Button("Digitar endereço") { beginEditing() }.buttonStyle(.bordered).tint(accent)
-        }.padding(24).frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color(red: 0.08, green: 0.09, blue: 0.10))
+        GeometryReader { geometry in
+            VStack(spacing: geometry.size.height < 260 ? 10 : 16) {
+                Image(systemName: "globe.americas.fill")
+                    .font(.system(size: geometry.size.height < 260 ? 28 : 42, weight: .light)).foregroundStyle(accent)
+                Text("Seu próximo destino").font(.title2.weight(.semibold))
+                if geometry.size.height >= 260 {
+                    Text("Digite ou cole um endereço para navegar.").font(.subheadline).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                }
+                Button("Digitar endereço") { beginEditing() }.buttonStyle(.bordered).tint(accent)
+            }.padding(16).frame(maxWidth: .infinity, maxHeight: .infinity)
+        }.background(Color(red: 0.08, green: 0.09, blue: 0.10))
     }
     private var recovery: some View {
         VStack(spacing: 16) {
