@@ -73,7 +73,7 @@ jobs:
       - name: Unit tests
         run: |
           set -euo pipefail
-          xcodebuild -project LinkCapture.xcodeproj -scheme LinkCapture -destination "platform=iOS Simulator,id=$SIMULATOR_ID" -derivedDataPath build/simulator -resultBundlePath build/UnitTests.xcresult -only-testing:LinkCaptureTests/PolicyTests -only-testing:LinkCaptureTests/CompatibilityTests CODE_SIGNING_ALLOWED=NO test
+          xcodebuild -project LinkCapture.xcodeproj -scheme LinkCapture -destination "platform=iOS Simulator,id=$SIMULATOR_ID" -derivedDataPath build/simulator -resultBundlePath build/UnitTests.xcresult -only-testing:LinkCaptureTests/PolicyTests -only-testing:LinkCaptureTests/CompatibilityTests -only-testing:LinkCaptureTests/SubscriptionTests CODE_SIGNING_ALLOWED=NO test
       - name: Real network validation (may expose incompatibility)
         if: github.event_name == 'workflow_dispatch' && inputs.network_tests
         env:
