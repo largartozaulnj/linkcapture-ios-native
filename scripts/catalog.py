@@ -1,8 +1,8 @@
 """Build the free AltStore Classic catalogue from actual public release IPAs.
 
 No version, build, size, minimum OS or hash is inferred from a tag or filename.
-SHA-256 is exported separately: the official Classic schema does not document
-a SHA-256 verification field, so the catalogue does not pretend AltStore uses it.
+The current public AltStore AppVersion decoder and VerifyAppOperation support
+sha256. Include it for compatible clients and publish a separate integrity report.
 """
 import hashlib
 import io
@@ -55,6 +55,7 @@ def validate(source):
         assert version["size"] > 0 and isinstance(version["size"], int)
         assert version["downloadURL"].startswith(f"https://github.com/{REPO}/releases/download/")
         assert version["date"] and version["localizedDescription"] and version["minOSVersion"] == "16.0"
+        assert re.fullmatch(r"[a-f0-9]{64}", version["sha256"])
     assert app["versions"], "No installable release"
 
 
@@ -94,7 +95,7 @@ def main():
         versions.append({"version": pair[0], "buildVersion": pair[1], "date": release["published_at"],
                          "localizedDescription": release["body"] or release["name"],
                          "downloadURL": asset["browser_download_url"], "size": len(raw),
-                         "minOSVersion": info["MinimumOSVersion"]})
+                         "minOSVersion": info["MinimumOSVersion"], "sha256": digest})
         integrity.append({"version": pair[0], "buildVersion": pair[1], "downloadURL": asset["browser_download_url"],
                           "size": len(raw), "sha256": digest, "release": release["html_url"]})
     def number(value):
