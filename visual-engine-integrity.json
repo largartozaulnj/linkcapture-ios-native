@@ -1,0 +1,38 @@
+{
+  "previousCommit": "b545748dafea5f8f32c558f91d7e09464425083c",
+  "visualCommit": "a6a7a47e20c947c7d7fade59886eb8b2f9d31f22",
+  "files": [
+    {
+      "file": "LinkCapture/BrowserModel.swift",
+      "unchanged": true,
+      "sha256": "33cd780a1bedc598b6ba88164249bf410875aa81af49eee28e26799ea2bbecc0"
+    },
+    {
+      "file": "LinkCapture/LocalSOCKSProxy.swift",
+      "unchanged": true,
+      "sha256": "7d8afe8599aae89451d3e15f768fd5d85cddff97feab667375332776c719fd48"
+    },
+    {
+      "file": "LinkCapture/DNSResolver.swift",
+      "unchanged": true,
+      "sha256": "d7297389e0f80b46d134556b79b2c9c22551c8beb71751cca8db243dc94ecd9f"
+    },
+    {
+      "file": "LinkCapture/URLPolicy.swift",
+      "unchanged": true,
+      "sha256": "6f9652f84496e64a7b4bf99c5906b24acce59ff96c41e35118a259659edbfdab"
+    },
+    {
+      "file": "LinkCapture.xcodeproj/project.pbxproj",
+      "unchanged": true,
+      "sha256": "b2c9530c74d096c9a221cd56efd4aef1ed36af734a07d31274b779ec5ad332dc"
+    },
+    {
+      "file": "LinkCapture/Info.plist",
+      "unchanged": true,
+      "sha256": "2eccb0f282933f36ae073c5b49b39d6ec1a067f08c06eb462beaf3ca43d28ee8"
+    }
+  ],
+  "nativeWebViewWrapperUnchanged": true,
+  "diagnosticsViewUnchanged": false
+}
