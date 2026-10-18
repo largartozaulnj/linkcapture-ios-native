@@ -11,7 +11,7 @@ A fonte não assina nem instala sozinha. Você autoriza a atualização no AltSt
 
 GitHub Releases hospeda IPAs; GitHub Pages hospeda o JSON. pages.yml reconstrói o catálogo lendo Info.plist dentro de cada IPA e conferindo tamanho real. Publicações futuras usam version/buildVersion novos no Info.plist; distribute.yml publica a IPA e dispara a atualização do catálogo. Os artefatos anteriores 0.1.0 declaravam todos build 1: somente a prévia visual mais recente representa esse par, sem inventar versões históricas.
 
-O esquema documentado do AltStore Classic não oferece campo SHA-256 de verificação. Os hashes ficam em integrity.json, sem afirmar que o AltStore os verifica. appPermissions declara apenas as permissões reais da IPA unsigned; notificações locais comuns não exigem entitlement de push ou alertas críticos.
+O guia resumido não lista SHA-256, mas o código público atual aceita sha256 em AppVersion e verifica o download em VerifyAppOperation. O catálogo inclui esse campo para clientes compatíveis e publica integrity.json separadamente. A versão exata do AltStore instalada precisa ser conferida no iPhone. Referências: https://github.com/altstoreio/AltStore/blob/marketplace/AltStoreCore/Model/AppVersion.swift e https://github.com/altstoreio/AltStore/blob/marketplace/AltStore/Operations/VerifyAppOperation.swift . appPermissions declara apenas as permissões reais da IPA unsigned; notificações locais comuns não exigem entitlement de push ou alertas críticos.
 
 ## Validade e notificações
 
