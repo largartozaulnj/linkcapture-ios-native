@@ -1,0 +1,35 @@
+name: Publish official AltStore source
+on:
+  workflow_dispatch:
+  release:
+    types: [published, edited]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: altstore-pages
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Build and validate catalogue from actual IPA metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -m unittest discover -s scripts -p 'test_catalog.py'
+          python3 scripts/catalog.py
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+      - name: Deploy free HTTPS source
+        id: deployment
+        uses: actions/deploy-pages@v4
