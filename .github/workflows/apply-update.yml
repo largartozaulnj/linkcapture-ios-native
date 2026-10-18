@@ -16,6 +16,7 @@ jobs:
           import hashlib, json
           from pathlib import Path
           from zipfile import ZipFile
+          assert not Path('subscription-engine-integrity.json').exists(), 'One-time update already applied; edit current sources instead'
           package=Path('LinkCapture-update-0.2.0.zip')
           assert hashlib.sha256(package.read_bytes()).hexdigest() == 'd0f2f1415612f0fa123fd62f1849d5fea07f8cf6b60fb273da7837826c285dfa'
           allowed=['LinkCapture/LinkCaptureApp.swift', 'LinkCapture/Subscription.swift', 'LinkCapture/Info.plist', 'LinkCaptureTests/SubscriptionTests.swift', 'LinkCapture.xcodeproj/project.pbxproj', 'scripts/catalog.py', 'scripts/test_catalog.py', 'docs/icon.png', 'docs/index.html', 'docs/.nojekyll', 'ASSINATURA-E-ATUALIZACOES.md']
