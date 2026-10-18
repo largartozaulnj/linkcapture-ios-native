@@ -5,7 +5,7 @@ on:
       build_run:
         description: Build run ID whose evidence should be exported
         required: true
-        default: "39008738033"
+        default: "39082541720"
 permissions:
   actions: read
   contents: write
@@ -29,7 +29,8 @@ jobs:
           xcrun xcresulttool export diagnostics --path package/NetworkTests.xcresult --output-path package/diagnostics
           xcrun xcresulttool get test-results summary --path package/UnitTests.xcresult > report/unit-test-summary.json
           xcrun xcresulttool export attachments --path package/NetworkTests.xcresult --output-path package/attachments
-          python3 - <<'PY' 
+          xcrun xcresulttool export attachments --path package/UnitTests.xcresult --output-path package/layout-attachments
+          python3 - <<'PY'
           import json
           from pathlib import Path
           reports=[]
@@ -67,6 +68,18 @@ jobs:
           Path('report/network-observations.json').write_text(json.dumps(observations,indent=2))
           print(json.dumps(observations,indent=2))
           PY
-          gh release upload "experimental-run-$BUILD_RUN" report/*.json --clobber
+          python3 - <<'PY'
+          import json, shutil
+          from pathlib import Path
+          images=[]
+          for file in sorted(Path('package/layout-attachments').rglob('*')):
+              if file.suffix.lower() not in ('.png','.jpg','.jpeg'): continue
+              name=f'layout-{len(images)+1}{file.suffix.lower()}'
+              shutil.copyfile(file,Path('report')/name)
+              images.append({'asset':name,'attachmentFile':file.name})
+          Path('report/layout-index.json').write_text(json.dumps(images,indent=2))
+          print(json.dumps(images,indent=2))
+          PY
+          gh release upload "experimental-run-$BUILD_RUN" report/* --clobber
 
 
