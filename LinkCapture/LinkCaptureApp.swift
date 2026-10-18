@@ -13,6 +13,9 @@ struct NativeWebView: UIViewRepresentable {
 
 @MainActor struct BrowserScreen: View {
     @StateObject private var model: BrowserModel
+    @StateObject private var subscription = SubscriptionModel()
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var showSubscription = false
     @State private var showDiagnostics = false
     @State private var showConnection = false
     @State private var showHelp = false
@@ -66,6 +69,11 @@ struct NativeWebView: UIViewRepresentable {
         .sheet(isPresented: $showDiagnostics) { DiagnosticScreen(model: model) }
         .sheet(isPresented: $showConnection) { connection }
         .sheet(isPresented: $showHelp) { help }
+        .sheet(isPresented: $showSubscription) { SubscriptionScreen(model: subscription) }
+        .task { await subscription.refresh() }
+        .onChange(of: scenePhase) { phase in
+            if phase == .active { Task { await subscription.refresh() } }
+        }
     }
 
     private var addressBar: some View {
@@ -116,6 +124,7 @@ struct NativeWebView: UIViewRepresentable {
                 finishEditing(); model.loading ? model.stop() : model.reload()
             }
             Menu {
+                Button { showSubscription = true } label: { Label("Assinatura e Atualizações", systemImage: "calendar.badge.clock") }
                 Button { model.diagnoseDNS(); showDiagnostics = true } label: { Label("Diagnóstico DNS", systemImage: "waveform.path.ecg") }
                 Button { showConnection = true } label: { Label("Informações da conexão", systemImage: "network") }
                 Button { UIPasteboard.general.string = currentURL } label: { Label("Copiar URL", systemImage: "doc.on.doc") }
