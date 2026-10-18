@@ -1,0 +1,36 @@
+name: Apply reviewed native update
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Apply only reviewed subscription/catalogue files
+        run: |
+          python3 - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          from zipfile import ZipFile
+          package=Path('LinkCapture-update-0.2.0.zip')
+          assert hashlib.sha256(package.read_bytes()).hexdigest() == 'd0f2f1415612f0fa123fd62f1849d5fea07f8cf6b60fb273da7837826c285dfa'
+          allowed=['LinkCapture/LinkCaptureApp.swift', 'LinkCapture/Subscription.swift', 'LinkCapture/Info.plist', 'LinkCaptureTests/SubscriptionTests.swift', 'LinkCapture.xcodeproj/project.pbxproj', 'scripts/catalog.py', 'scripts/test_catalog.py', 'docs/icon.png', 'docs/index.html', 'docs/.nojekyll', 'ASSINATURA-E-ATUALIZACOES.md']
+          protected=['LinkCapture/BrowserModel.swift','LinkCapture/LocalSOCKSProxy.swift','LinkCapture/DNSResolver.swift','LinkCapture/URLPolicy.swift']
+          before={p:hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in protected}
+          with ZipFile(package) as archive:
+              assert sorted(archive.namelist()) == sorted(allowed)
+              for name in allowed:
+                  path=Path(name)
+                  assert not path.is_absolute() and '..' not in path.parts and '.github' not in path.parts
+                  path.parent.mkdir(parents=True,exist_ok=True)
+                  path.write_bytes(archive.read(name))
+          assert before == {p:hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in protected}
+          Path('subscription-engine-integrity.json').write_text(json.dumps(before,indent=2))
+          PY
+          git add LinkCapture/LinkCaptureApp.swift LinkCapture/Subscription.swift LinkCapture/Info.plist LinkCaptureTests/SubscriptionTests.swift LinkCapture.xcodeproj/project.pbxproj scripts/catalog.py scripts/test_catalog.py docs ASSINATURA-E-ATUALIZACOES.md subscription-engine-integrity.json
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Add official AltStore source and local renewal reminders [skip ci]'
+          git push origin HEAD:main
