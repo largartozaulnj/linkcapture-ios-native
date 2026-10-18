@@ -8,7 +8,7 @@ on:
         default: '39004968676'
 permissions:
   contents: write
-  actions: read
+  actions: write
 jobs:
   package:
     runs-on: ubuntu-latest
@@ -46,7 +46,7 @@ jobs:
               assert len(archive.read('Payload/LinkCapture.app/LinkCapture'))>0
           run=json.loads(Path('package/run.json').read_text())
           result={'buildRun':run['html_url'],'triggerCommit':run['head_sha'],'minimumIOS':info['MinimumOSVersion'],
-                  'sdk':info.get('DTSDKName'),'xcode':info.get('DTXcode'),'version':info.get('CFBundleShortVersionString'),
+                  'sdk':info.get('DTSDKName'),'xcode':info.get('DTXcode'),'version':info.get('CFBundleShortVersionString'),'buildVersion':info.get('CFBundleVersion'),
                   'bundleIdentifier':info['CFBundleIdentifier'],'sha256':hashlib.sha256(ipa.read_bytes()).hexdigest(),
                   'signing':'UNSIGNED — requires local re-signing','steps':steps,'realIPhoneDNSValidation':'NOT EXECUTED'}
           Path('package/BUILD-INFO.json').write_text(json.dumps(result,indent=2))
@@ -71,3 +71,7 @@ jobs:
           else
             gh release create "$TAG" package/LinkCapture-experimental-UNSIGNED.ipa package/BUILD-INFO.json --target "$SOURCE_SHA" --title "LinkCapture experimental — build $BUILD_RUN (unsigned)" --prerelease --notes-file package/NOTES.md
           fi
+
+      - name: Refresh official AltStore catalogue after IPA publication
+        shell: bash
+        run: gh workflow run pages.yml --ref main
